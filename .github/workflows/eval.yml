@@ -1,0 +1,57 @@
+name: Evaluation
+# Simulated-caller conversations and speech-to-text accuracy against Groq. The free tier allows 200K tokens a day per
+# model, so the conversation suite is resumable: the nightly run continues where the last one stopped until it is
+# complete, always with the same models.
+on:
+  workflow_dispatch:
+    inputs:
+      suite:
+        description: "conversations, stt or both"
+        default: both
+      fresh:
+        description: "Start the conversation suite from scratch"
+        type: boolean
+        default: false
+  schedule:
+    - cron: "41 20 * * *"   # 02:11 IST, when demo traffic is lowest
+
+permissions:
+  contents: write
+
+concurrency:
+  group: eval
+  cancel-in-progress: false
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    env:
+      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e ".[llm,speech,eval]"
+      - name: Check what is left to do
+        id: todo
+        run: |
+          SUITE="${{ inputs.suite || 'conversations' }}"
+          DONE=$(python -c "import json,pathlib;p=pathlib.Path('results/conversations.json');print(json.loads(p.read_text())['summary'].get('complete', False) if p.exists() else False)")
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "$DONE" = "True" ]; then SUITE=none; fi
+          echo "suite=$SUITE" >> "$GITHUB_OUTPUT"
+          echo "Running: $SUITE (conversation suite complete: $DONE)"
+      - name: Conversations
+        if: steps.todo.outputs.suite == 'conversations' || steps.todo.outputs.suite == 'both'
+        run: python -m receptionist.evaluate --out results ${{ inputs.fresh && '--fresh' || '' }}
+      - name: Speech to text
+        if: steps.todo.outputs.suite == 'stt' || steps.todo.outputs.suite == 'both'
+        run: python -m receptionist.stt_eval --out results --fleurs-n 100
+      - name: Commit results
+        if: always() && steps.todo.outputs.suite != 'none'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add results
+          git diff --cached --quiet && echo "no changes" || (git commit -m "Evaluation results from CI" && git pull --rebase && git push)
