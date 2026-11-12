@@ -1,0 +1,446 @@
+{
+ "fleurs_n": 100,
+ "utterances": {
+  "summary": {
+   "whisper-large-v3-turbo": {
+    "en": {
+     "utterances": 5,
+     "entity_accuracy": 1.0,
+     "all_entities_correct": 1.0,
+     "urdu_script_retries": 0,
+     "latency_ms_p50": 288
+    },
+    "hi": {
+     "utterances": 5,
+     "entity_accuracy": 0.917,
+     "all_entities_correct": 0.8,
+     "urdu_script_retries": 0,
+     "latency_ms_p50": 246
+    },
+    "hinglish": {
+     "utterances": 5,
+     "entity_accuracy": 0.818,
+     "all_entities_correct": 0.6,
+     "urdu_script_retries": 0,
+     "latency_ms_p50": 222
+    }
+   },
+   "whisper-large-v3": {
+    "en": {
+     "utterances": 5,
+     "entity_accuracy": 1.0,
+     "all_entities_correct": 1.0,
+     "urdu_script_retries": 0,
+     "latency_ms_p50": 392
+    },
+    "hi": {
+     "utterances": 5,
+     "entity_accuracy": 0.75,
+     "all_entities_correct": 0.4,
+     "urdu_script_retries": 0,
+     "latency_ms_p50": 333
+    },
+    "hinglish": {
+     "utterances": 5,
+     "entity_accuracy": 0.909,
+     "all_entities_correct": 0.8,
+     "urdu_script_retries": 0,
+     "latency_ms_p50": 340
+    }
+   }
+  },
+  "tts_latency_ms_p50": 821,
+  "rows": [
+   {
+    "style": "en",
+    "model": "whisper-large-v3-turbo",
+    "text": "Hi, I'd like to see Doctor Mehta on Thursday morning. My number is 9876501234.",
+    "transcript": "Hi, I'd like to see Dr. Mehta on Thursday morning. My number is 987-650-1234.",
+    "whisper_language": "English",
+    "entities": 3,
+    "found": 3,
+    "retried_as_hindi": false,
+    "latency_ms": 441,
+    "tts_engine": "edge-tts"
+   },
+   {
+    "style": "en",
+    "model": "whisper-large-v3",
+    "text": "Hi, I'd like to see Doctor Mehta on Thursday morning. My number is 9876501234.",
+    "transcript": "Hi, I'd like to see Dr. Mehta on Thursday morning. My number is 987-650-1234.",
+    "whisper_language": "English",
+    "entities": 3,
+    "found": 3,
+    "retried_as_hindi": false,
+    "latency_ms": 392,
+    "tts_engine": "edge-tts"
+   },
+   {
+    "style": "en",
+    "model": "whisper-large-v3-turbo",
+    "text": "Please book my son with Doctor Khan on Saturday evening.",
+    "transcript": "Please book my son with Dr. Khan on Saturday evening.",
+    "whisper_language": "English",
+    "entities": 2,
+    "found": 2,
+    "retried_as_hindi": false,
+    "latency_ms": 255,
+    "tts_engine": "edge-tts"
+   },
+   {
+    "style": "en",
+    "model": "whisper-large-v3",
+    "text": "Please book my son with Doctor Khan on Saturday evening.",
+    "transcript": "Please book my son with Dr. Khan on Saturday evening.",
+    "whisper_language": "English",
+    "entities": 2,
+    "found": 2,
+    "retried_as_hindi": false,
+    "latency_ms": 368,
+    "tts_engine": "edge-tts"
+   },
+   {
+    "style": "en",
+    "model": "whisper-large-v3-turbo",
+    "text": "Can I move my dentist appointment to Tuesday? My mobile is 9811122233.",
+    "transcript": "Can I move my dentist appointment to Tuesday? My mobile is 9811122233.",
+    "whisper_language": "English",
+    "entities": 3,
+    "found": 3,
+    "retried_as_hindi": false,
+    "latency_ms": 329,
+    "tts_engine": "edge-tts"
+   },
+   {
+    "style": "en",
+    "model": "whisper-large-v3",
+    "text": "Can I move my dentist appointment to Tuesday? My mobile is 9811122233.",
+    "transcript": "Can I move my dentist appointment to Tuesday? My mobile is 9811122233.",
+    "whisper_language": "English",
+    "entities": 3,
+    "found": 3,
+    "retried_as_hindi": false,
+    "latency_ms": 426,
+    "tts_engine": "edge-tts"
+   },
+   {
+    "style": "en",
+    "model": "whisper-large-v3-turbo",
+    "text": "This is Neha Arora, I need the skin doctor, Doctor Singh, on Monday.",
+    "transcript": "This is Neha Arora, I need the skin doctor, Dr. Singh, on Monday.",
+    "whisper_language": "English",
+    "entities": 3,
+    "found": 3,
+    "retried_as_hindi": false,
+    "latency_ms": 215,
+    "tts_engine": "edge-tts"
+   },
+   {
+    "style": "en",
+    "model": "whisper-large-v3",
+    "text": "This is Neha Arora, I need the skin doctor, Doctor Singh, on Monday.",
+    "transcript": "This is Neha Arora, I need the skin doctor, Dr. Singh, on Monday.",
+    "whisper_language": "English",
+    "entities": 3,
+    "found": 3,
+    "retried_as_hindi": false,
+    "latency_ms": 400,
+    "tts_engine": "edge-tts"
+   },
+   {
+    "style": "en",
+    "model": "whisper-large-v3-turbo",
+    "text": "What are the fees for Doctor Iyer?",
+    "transcript": "What are the fees for Dr. Iyer?",
+    "whisper_language": "English",
+    "entities": 2,
+    "found": 2,
+    "retried_as_hindi": false,
+    "latency_ms": 288,
+    "tts_engine": "edge-tts"
+   },
+   {
+    "style": "en",
+    "model": "whisper-large-v3",
+    "text": "What are the fees for Doctor Iyer?",
+    "transcript": "What are the fees for Dr. Iyer?",
+    "whisper_language": "English",
+    "entities": 2,
+    "found": 2,
+    "retried_as_hindi": false,
+    "latency_ms": 264,
+    "tts_engine": "edge-tts"
+   },
+   {
+    "style": "hi",
+    "model": "whisper-large-v3-turbo",
+    "text": "नमस्ते, मुझे गुरुवार को डॉक्टर मेहता से मिलना है। मेरा नंबर 9876501234 है।",
+    "transcript": "नमस्ते, मुझे गुरुवार को Dr. Mehta से मिलना है. मेरा नमबर 98765101234 है.",
+    "whisper_language": "Hindi",
+    "entities": 3,
+    "found": 2,
+    "retried_as_hindi": false,
+    "latency_ms": 244,
+    "tts_engine": "edge-tts"
+   },
+   {
+    "style": "hi",
+    "model": "whisper-large-v3",
+    "text": "नमस्ते, मुझे गुरुवार को डॉक्टर मेहता से मिलना है। मेरा नंबर 9876501234 है।",
+    "transcript": "नमस्ते मुझे गुरुवार को डॉक्टर मेहता से मिलना है मेरा नमबर 9876501234 है",
+    "whisper_language": "Hindi",
+    "entities": 3,
+    "found": 3,
+    "retried_as_hindi": false,
+    "latency_ms": 766,
+    "tts_engine": "edge-tts"
+   },
+   {
+    "style": "hi",
+    "model": "whisper-large-v3-turbo",
+    "text": "मेरे बेटे के लिए शनिवार शाम को डॉक्टर ख़ान का अपॉइंटमेंट चाहिए।",
+    "transcript": "मेरे बेटे के लिए शनिवार शाम को Dr. Khan का appointment चाहिए.",
+    "whisper_language": "Hindi",
+    "entities": 2,
+    "found": 2,
+    "retried_as_hindi": false,
+    "latency_ms": 343,
+    "tts_engine": "edge-tts"
+   },
+   {
+    "style": "hi",
+    "model": "whisper-large-v3",
+    "text": "मेरे बेटे के लिए शनिवार शाम को डॉक्टर ख़ान का अपॉइंटमेंट चाहिए।",
+    "transcript": "मेरे बेटे के लिए शनिवार शाम को डॉक्टर खान का appointment चाहिए",
+    "whisper_language": "Hindi",
+    "entities": 2,
+    "found": 2,
+    "retried_as_hindi": false,
+    "latency_ms": 331,
+    "tts_engine": "edge-tts"
+   },
+   {
+    "style": "hi",
+    "model": "whisper-large-v3-turbo",
+    "text": "क्या मंगलवार को दाँतों की डॉक्टर मिलेंगी? मेरा मोबाइल 9811122233 है।",
+    "transcript": "क्या मंगलवार को दातों की डॉक्टर मिलेंगी? मेरा मोबाइल नमबर 9811122233 है.",
+    "whisper_language": "Hindi",
+    "entities": 2,
+    "found": 2,
+    "retried_as_hindi": false,
+    "latency_ms": 246,
+    "tts_engine": "edge-tts"
+   },
+   {
+    "style": "hi",
+    "model": "whisper-large-v3",
+    "text": "क्या मंगलवार को दाँतों की डॉक्टर मिलेंगी? मेरा मोबाइल 9811122233 है।",
+    "transcript": "क्या मंगलवार को दातो की डॉक्टर मिलेंगी? मेरा मोबाइल नमबर 981112233 है.",
+    "whisper_language": "Hindi",
+    "entities": 2,
+    "found": 1,
+    "retried_as_hindi": false,
+    "latency_ms": 345,
+    "tts_engine": "edge-tts"
+   },
+   {
+    "style": "hi",
+    "model": "whisper-large-v3-turbo",
+    "text": "मेरा नाम सुरेश यादव है, सोमवार को डॉक्टर सिंह का समय मिलेगा?",
+    "transcript": "मेरा नाम सुरेश यादव है, सोमवार को Dr. Singh का समय मिलेगा?",
+    "whisper_language": "Hindi",
+    "entities": 3,
+    "found": 3,
+    "retried_as_hindi": false,
+    "latency_ms": 334,
+    "tts_engine": "edge-tts"
+   },
+   {
+    "style": "hi",
+    "model": "whisper-large-v3",
+    "text": "मेरा नाम सुरेश यादव है, सोमवार को डॉक्टर सिंह का समय मिलेगा?",
+    "transcript": "मेरा नाम सुरेश यादव है, सोमवार को डॉक्टर सिंग का समय मिलेगा",
+    "whisper_language": "Hindi",
+    "entities": 3,
+    "found": 2,
+    "retried_as_hindi": false,
+    "latency_ms": 333,
+    "tts_engine": "edge-tts"
+   },
+   {
+    "style": "hi",
+    "model": "whisper-large-v3-turbo",
+    "text": "डॉक्टर अय्यर की फ़ीस कितनी है?",
+    "transcript": "Dr. Iyer की फीस कितनी है?",
+    "whisper_language": "Hindi",
+    "entities": 2,
+    "found": 2,
+    "retried_as_hindi": false,
+    "latency_ms": 193,
+    "tts_engine": "edge-tts"
+   },
+   {
+    "style": "hi",
+    "model": "whisper-large-v3",
+    "text": "डॉक्टर अय्यर की फ़ीस कितनी है?",
+    "transcript": "डॉक्टर आयर की फीस कितनी है?",
+    "whisper_language": "Hindi",
+    "entities": 2,
+    "found": 1,
+    "retried_as_hindi": false,
+    "latency_ms": 270,
+    "tts_engine": "edge-tts"
+   },
+   {
+    "style": "hinglish",
+    "model": "whisper-large-v3-turbo",
+    "text": "मुझे Thursday को Doctor Mehta का appointment चाहिए, मेरा number 9876501234 है।",
+    "transcript": "मुझे थर्सडे को Dr. Mehta का appointment चाहिए, मेरा number 987-650-1234 है.",
+    "whisper_language": "Hindi",
+    "entities": 3,
+    "found": 3,
+    "retried_as_hindi": false,
+    "latency_ms": 291,
+    "tts_engine": "edge-tts"
+   },
+   {
+    "style": "hinglish",
+    "model": "whisper-large-v3",
+    "text": "मुझे Thursday को Doctor Mehta का appointment चाहिए, मेरा number 9876501234 है।",
+    "transcript": "मुझे थर्सडे को डॉक्टर मेहता का appointment चाहिए, मेरा number 9876501234 है",
+    "whisper_language": "Hindi",
+    "entities": 3,
+    "found": 3,
+    "retried_as_hindi": false,
+    "latency_ms": 340,
+    "tts_engine": "edge-tts"
+   },
+   {
+    "style": "hinglish",
+    "model": "whisper-large-v3-turbo",
+    "text": "मेरे बेटे को fever है, Saturday evening को Doctor Khan मिलेंगे क्या?",
+    "transcript": "मेरे बेटे को फीवर है, साटरडे इवनिंग को डॉक्टर खान मिलेंगे क्या?",
+    "whisper_language": "Hindi",
+    "entities": 2,
+    "found": 1,
+    "retried_as_hindi": false,
+    "latency_ms": 364,
+    "tts_engine": "edge-tts"
+   },
+   {
+    "style": "hinglish",
+    "model": "whisper-large-v3",
+    "text": "मेरे बेटे को fever है, Saturday evening को Doctor Khan मिलेंगे क्या?",
+    "transcript": "मेरे बेटे को फीवर है, साटडे इवनिंग को डॉक्टर खान मिलेंगे क्या?",
+    "whisper_language": "Hindi",
+    "entities": 2,
+    "found": 1,
+    "retried_as_hindi": false,
+    "latency_ms": 333,
+    "tts_engine": "edge-tts"
+   },
+   {
+    "style": "hinglish",
+    "model": "whisper-large-v3-turbo",
+    "text": "मेरा dentist वाला appointment Tuesday पर shift कर दीजिए, mobile 9811122233।",
+    "transcript": "मेरा डेंटिस्ट वाला अपॉइंट्मेंट त्यूजडे पर शिफ्ट कर दीजिए, मोबाल 98 1112 2233",
+    "whisper_language": "Hindi",
+    "entities": 2,
+    "found": 1,
+    "retried_as_hindi": false,
+    "latency_ms": 222,
+    "tts_engine": "edge-tts"
+   },
+   {
+    "style": "hinglish",
+    "model": "whisper-large-v3",
+    "text": "मेरा dentist वाला appointment Tuesday पर shift कर दीजिए, mobile 9811122233।",
+    "transcript": "मेरा डेंटिस्ट वाला appointment ट्यूज़डे पर shift कर दीजिए, mobile 9811122233",
+    "whisper_language": "Hindi",
+    "entities": 2,
+    "found": 2,
+    "retried_as_hindi": false,
+    "latency_ms": 375,
+    "tts_engine": "edge-tts"
+   },
+   {
+    "style": "hinglish",
+    "model": "whisper-large-v3-turbo",
+    "text": "Skin doctor Doctor Singh का Monday का slot available है क्या?",
+    "transcript": "Skin Dr. Dr. Singh ka Monday ka slot available hai kya?",
+    "whisper_language": "Hindi",
+    "entities": 2,
+    "found": 2,
+    "retried_as_hindi": false,
+    "latency_ms": 207,
+    "tts_engine": "edge-tts"
+   },
+   {
+    "style": "hinglish",
+    "model": "whisper-large-v3",
+    "text": "Skin doctor Doctor Singh का Monday का slot available है क्या?",
+    "transcript": "Skin Doctor, Dr. Singh का Monday का Slot Available है क्या?",
+    "whisper_language": "Hindi",
+    "entities": 2,
+    "found": 2,
+    "retried_as_hindi": false,
+    "latency_ms": 272,
+    "tts_engine": "edge-tts"
+   },
+   {
+    "style": "hinglish",
+    "model": "whisper-large-v3-turbo",
+    "text": "Doctor Iyer की consultation fees कितनी है?",
+    "transcript": "Dr. Iyer की Consultation Fees कितनी है?",
+    "whisper_language": "Hindi",
+    "entities": 2,
+    "found": 2,
+    "retried_as_hindi": false,
+    "latency_ms": 196,
+    "tts_engine": "edge-tts"
+   },
+   {
+    "style": "hinglish",
+    "model": "whisper-large-v3",
+    "text": "Doctor Iyer की consultation fees कितनी है?",
+    "transcript": "Dr. Iyer की Consultation Fees कितनी है?",
+    "whisper_language": "Hindi",
+    "entities": 2,
+    "found": 2,
+    "retried_as_hindi": false,
+    "latency_ms": 481,
+    "tts_engine": "edge-tts"
+   }
+  ]
+ },
+ "fleurs": {
+  "hi_in": {
+   "whisper-large-v3-turbo": {
+    "clips": 53,
+    "wer": 0.3213,
+    "cer": 0.116,
+    "latency_ms_p50": 739
+   },
+   "whisper-large-v3": {
+    "clips": 83,
+    "wer": 0.2691,
+    "cer": 0.096,
+    "latency_ms_p50": 978
+   }
+  },
+  "en_us": {
+   "whisper-large-v3-turbo": {
+    "clips": 43,
+    "wer": 0.0488,
+    "cer": 0.0242,
+    "latency_ms_p50": 509
+   },
+   "whisper-large-v3": {
+    "clips": 45,
+    "wer": 0.0458,
+    "cer": 0.0219,
+    "latency_ms_p50": 662
+   }
+  }
+ }
+}
