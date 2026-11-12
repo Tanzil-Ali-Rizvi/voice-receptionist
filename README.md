@@ -76,7 +76,7 @@ pip install -e ".[llm,speech,app,dev]"
 export GROQ_API_KEY=...
 streamlit run app/streamlit_app.py
 
-pytest -q                                  # 62 tests, no network or keys needed
+pytest -q                                  # 64 tests, no network or keys needed
 python -m receptionist.evaluate            # simulated callers (resumes if it hits the daily token limit)
 python -m receptionist.stt_eval            # FLEURS + clinic-detail speech-to-text accuracy
 ```

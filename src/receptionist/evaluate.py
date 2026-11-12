@@ -46,7 +46,8 @@ def caller_system(sc: dict[str, Any]) -> str:
     return f"""You are role-playing a CALLER phoning a clinic receptionist. Stay in character.
 Your goal: {sc["goal"]}
 {STYLE[sc["lang"]]}
-Speak naturally and briefly (one or two short sentences), like on a phone call. Answer only what the receptionist asks;
+Speak naturally and briefly (one or two short sentences), like on a phone call. Say only your next line, never
+several turns at once. Answer only what the receptionist asks;
 give details such as your name or number when asked. If the receptionist reads back details and asks you to confirm,
 answer exactly as your goal says. Only when your goal is done (the receptionist has given a booking reference or
 confirmed the change) or they clearly cannot help, reply with only the word [END]. Never end while the receptionist is
@@ -159,13 +160,10 @@ async def run_one(sc: dict[str, Any], agent_llm: LLM, caller_llm: LLM) -> dict[s
         if nxt is None:
             infra = "caller simulator returned nothing"
             break
-        last = "[END]" in nxt
+        # The simulator sometimes says "Yes, please. [END]" before the receptionist has finished. Only a bare [END]
+        # ends the call; otherwise the line is said and the call goes on (MAX_TURNS still caps it).
         caller_line = nxt.replace("[END]", "").strip()
         if not caller_line:
-            break
-        if last:  # "Yes, please. [END]": the line still has to reach the receptionist before the caller hangs up
-            turn = await rec.respond(caller_line)
-            transcript += [{"role": "caller", "text": caller_line}, {"role": "riya", "text": turn.reply}]
             break
     ok, why = check(sc, rec, seeded)
     # Judged against the scenario's language, not the per-turn guess, so a wrongly detected turn counts as a miss.

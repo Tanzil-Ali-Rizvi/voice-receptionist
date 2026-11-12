@@ -72,6 +72,7 @@ TOOLS: list[dict[str, Any]] = [
                     "slot_id": {"type": "string", "description": "from find_slots/next_available"},
                     "patient_name": {"type": "string"},
                     "phone": {"type": "string", "description": "10-digit mobile"},
+                    "second_visit": {"type": "boolean", "description": "true only if the caller wants another visit"},
                 },
                 "required": ["slot_id", "patient_name", "phone"],
             },
@@ -239,13 +240,16 @@ class Desk:
                 works_on=days,
                 nearest_days=self._working_days_from(doc, day),
             )
-        free = self.clinic.free_slots(doc, day, a.get("part_of_day") or "any")
-        return ToolResult(
-            "find_slots",
-            a,
-            True,
-            {"doctor": doc.name, "slots": self._slots(doc, free[:5]), "more": max(0, len(free) - 5)},
-        )
+        part = a.get("part_of_day") or "any"
+        free = self.clinic.free_slots(doc, day, part)
+        data: dict[str, Any] = {"doctor": doc.name}
+        if not free and part != "any":
+            # "Afternoon" for a doctor who works 4-8 pm: show that day's times instead of an empty list.
+            free = self.clinic.free_slots(doc, day, "any")
+            if free:
+                data["note"] = f"nothing in the {part}; these are the other free times that day"
+        data |= {"slots": self._slots(doc, free[:5]), "more": max(0, len(free) - 5)}
+        return ToolResult("find_slots", a, True, data)
 
     def t_next_available(self, a: dict) -> ToolResult:
         doc = self._doctor(a.get("doctor", ""))
@@ -258,7 +262,9 @@ class Desk:
             day = start + timedelta(days=k)
             if day > today + timedelta(days=14):
                 break
-            found += self.clinic.free_slots(doc, day, a.get("part_of_day") or "any")
+            found += self.clinic.free_slots(doc, day, a.get("part_of_day") or "any") or (
+                self.clinic.free_slots(doc, day, "any") if (a.get("part_of_day") or "any") != "any" else []
+            )
             if len(found) >= 3:
                 break
         data: dict[str, Any] = {"doctor": doc.name, "slots": self._slots(doc, found[:3])}
@@ -287,6 +293,20 @@ class Desk:
         name = " ".join((a.get("patient_name") or "").split())[:60]
         if len(name) < 2:
             return self._err("propose_booking", a, "patient name is missing")
+        # A patient who already has a visit with this doctor usually wants to move it, not add a second one.
+        same = [
+            b for b in self.clinic.find_by_phone(phone)
+            if b["doctor_id"] == doc.id and b["patient_name"].lower() == name.lower()
+        ]  # fmt: skip
+        if same and not a.get("second_visit"):
+            b = same[0]
+            when = describe_slot(DOCTOR_BY_ID[b["doctor_id"]], datetime.fromisoformat(b["start"]), "en")
+            return self._err(
+                "propose_booking",
+                a,
+                f"{name} already has {b['ref']} ({when}). To move it use propose_reschedule with booking_ref "
+                f"{b['ref']}; only if the caller wants an extra visit, call again with second_visit=true.",
+            )
         self.pending = Pending(
             "book",
             {"doctor_id": doc.id, "start": start.isoformat(), "patient_name": name, "phone": phone},

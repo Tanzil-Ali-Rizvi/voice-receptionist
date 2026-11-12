@@ -3,7 +3,7 @@ from datetime import datetime
 import pytest
 
 from receptionist.agent import Receptionist
-from receptionist.clinic import IST, Clinic, normalize_phone, parse_slot_id
+from receptionist.clinic import DOCTOR_BY_ID, IST, Clinic, normalize_phone, parse_slot_id, slot_id
 from receptionist.lang import confirmation, detect, reply_matches
 from receptionist.llm import ScriptedLLM
 from receptionist.safety import emergency, looks_like_medical_advice, redact_phones
@@ -276,3 +276,27 @@ def test_success_claims_are_recognised():
     assert not claims_done("You can cancel free of charge up to 2 hours before.")
     assert not claims_done("Your booking reference is SFC-8166.", {"SFC-8166"})
     assert claims_done("Your booking reference is SFC-0001.", {"SFC-8166"})
+
+
+def test_existing_patient_is_steered_to_reschedule():
+    from receptionist.tools import Desk
+
+    clinic = Clinic(MONDAY)
+    rahul = next(b for b in clinic.bookings() if b["patient_name"] == "Rahul Sharma")
+    day = rahul["start"][:10]
+    later = [s for s in clinic.free_slots(DOCTOR_BY_ID["mehta"], datetime.fromisoformat(rahul["start"]).date())]
+    slot = slot_id("mehta", later[-1]) if later else first_free(clinic, "mehta", day)
+    desk = Desk(clinic)
+    res = desk.run("propose_booking", {"slot_id": slot, "patient_name": "Rahul Sharma", "phone": "9811122233"})
+    assert not res.ok and rahul["ref"] in res.data["error"] and "propose_reschedule" in res.data["error"]
+    ok = desk.run("propose_booking", {"slot_id": slot, "patient_name": "Rahul Sharma", "phone": "9811122233",
+                                      "second_visit": True})  # fmt: skip
+    assert ok.ok
+
+
+def test_part_of_day_falls_back_to_that_days_times():
+    from receptionist.tools import Desk
+
+    desk = Desk(Clinic(MONDAY))
+    res = desk.run("find_slots", {"doctor": "khan", "date": "2026-11-18", "part_of_day": "afternoon"})
+    assert res.ok and res.data["slots"] and "nothing in the afternoon" in res.data["note"]
