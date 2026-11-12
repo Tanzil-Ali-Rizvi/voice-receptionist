@@ -19,7 +19,8 @@ from datetime import timedelta
 from typing import Any
 
 from .clinic import CLINIC_NAME, DOCTORS, Clinic
-from .lang import Lang, confirmation, detect, reply_lang, reply_matches
+from .dates import date_note
+from .lang import Lang, confirmation, detect, english_evidence, reply_lang, reply_matches
 from .llm import LLM
 from .safety import NO_ADVICE_REPLY, emergency, emergency_reply, looks_like_medical_advice, redact_phones
 from .tools import TOOLS, Desk, ToolResult, public_log
@@ -115,8 +116,8 @@ class Receptionist:
 
     def _update_lang(self, text: str) -> Lang:
         got = detect(text)
-        # "ok", "yes", "5 baje" are too short to switch languages mid-call.
-        if got == "en" and self.lang != "en" and len(text.split()) <= 3:
+        # Turns that are mostly a name, a number or "ok" ("Anaya Singh, 9654321098") don't switch the call to English.
+        if got == "en" and self.lang != "en" and english_evidence(text) < 2:
             return self.lang
         self.lang = got
         return got
@@ -158,6 +159,11 @@ class Receptionist:
             else:
                 note = (f"SYSTEM NOTE: a {kind_p} is still waiting for a clear yes or no and has NOT been done. "
                         "If the caller wants something different, search again and propose again.")  # fmt: skip
+
+        # Day words resolved in code ("kal" = tomorrow = Tuesday 2026-11-17), so the model doesn't guess dates.
+        dn = date_note(text, self.clinic.now)
+        if dn:
+            note = f"{note}\n{dn}".strip()
 
         # 4. LLM with tools
         if self.llm is None:

@@ -188,3 +188,31 @@ async def test_llm_failure_falls_back_to_human():
     r = Receptionist(ScriptedLLM([]), Clinic(MONDAY))
     t = await r.respond("what are your hours?")
     assert "staff" in t.reply and t.handoff
+
+
+# ------------------------------------------------------------------ dates and language stickiness
+def test_day_words_resolve_in_three_languages():
+    from receptionist.dates import date_note, resolve_days
+
+    days = dict(resolve_days("kal subah ya parso shaam", MONDAY))
+    assert str(days["kal"]) == "2026-11-17" and str(days["parso"]) == "2026-11-18"
+    assert str(dict(resolve_days("कल डॉक्टर मेहता", MONDAY))["कल"]) == "2026-11-17"
+    assert str(dict(resolve_days("the day after tomorrow", MONDAY))["day after tomorrow"]) == "2026-11-18"
+    assert "tomorrow" not in dict(resolve_days("the day after tomorrow", MONDAY))
+    assert str(dict(resolve_days("shaniwar ko", MONDAY))["shaniwar"]) == "2026-11-21"
+    assert str(dict(resolve_days("Monday next week", MONDAY))["monday"]) == "2026-11-23"
+    assert resolve_days("कलम लेकर आना", MONDAY) == [] and resolve_days("sun lo, mujhe doctor chahiye", MONDAY) == []
+    assert "Tuesday 2026-11-17" in date_note("mujhe kal appointment chahiye", MONDAY)
+
+
+async def test_name_and_number_turn_keeps_the_hindi_reply():
+    r = Receptionist(ScriptedLLM(["नाम बताइए।", "ठीक है।"]), Clinic(MONDAY))
+    await r.respond("bachche ko bukhar hai, doctor kab milenge?")
+    t = await r.respond("Beti Anaya Singh, number 9654321098")
+    assert t.user_lang == "hinglish" and t.reply_lang == "hi"
+
+
+async def test_date_note_reaches_the_model():
+    llm = ScriptedLLM(["ठीक है।"])
+    await Receptionist(llm, Clinic(MONDAY)).respond("kal dentist milega?")
+    assert "kal' = tomorrow = Tuesday 2026-11-17" in llm.seen[0][0]["content"]

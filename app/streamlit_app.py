@@ -188,12 +188,13 @@ with right:
     rows = []
     for b in seen:
         doc = DOCTOR_BY_ID[b["doctor_id"]]
-        rows.append({"Ref": b["ref"], "Patient": b["patient_name"], "Phone": mask_phone(b["phone"]),
+        rows.append({"Ref": b["ref"], "Patient": b["patient_name"], "Phone": mask_phone(b["phone"]).replace("*", "•"),
                      "When": describe_slot(doc, datetime.fromisoformat(b["start"]), "en").split(" with ")[0],
                      "Doctor": doc.name, "Status": b["status"]})  # fmt: skip
     st.dataframe(rows, hide_index=True, width="stretch")
     st.caption(
-        "Rahul Sharma (98******33) and Sunita Verma (98******10) already have appointments, so you can try cancelling or moving one."
+        "Rahul Sharma (phone 9811122233) and Sunita Verma (9876543210) are fictional patients who already have "
+        "appointments, so you can try cancelling or moving one."
     )
 
     if rec.turns and rec.turns[-1].tools:

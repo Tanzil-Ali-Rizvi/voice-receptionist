@@ -53,12 +53,19 @@ the word [END]. Never write the receptionist's lines."""
 
 
 async def simulate_caller(llm: LLM, sc: dict[str, Any], transcript: list[dict[str, str]]) -> str | None:
+    """The caller's next line, or None if the simulator failed (an infrastructure error, not a hang-up)."""
     # From the caller's point of view, the receptionist is the "user" and the caller is the "assistant".
     msgs = [{"role": "system", "content": caller_system(sc)}]
     for t in transcript:
         msgs.append({"role": "assistant" if t["role"] == "caller" else "user", "content": t["text"]})
-    r: LLMReply = await llm.chat(msgs, [], temperature=0.4)
-    return (r.message.get("content") or "").strip() if r.ok else None  # None: the simulator itself failed
+    for temperature in (0.4, 0.9):  # reasoning models occasionally return an empty message; try once more
+        r: LLMReply = await llm.chat(msgs, [], temperature=temperature)
+        if not r.ok:
+            return None
+        text = (r.message.get("content") or "").strip()
+        if text:
+            return text
+    return None
 
 
 def phone_in(text: str) -> str | None:
@@ -149,13 +156,14 @@ async def run_one(sc: dict[str, Any], agent_llm: LLM, caller_llm: LLM) -> dict[s
             break
         nxt = await simulate_caller(caller_llm, sc, transcript)
         if nxt is None:
-            infra = "caller simulator failed"
+            infra = "caller simulator returned nothing"
             break
         caller_line = nxt
         if not caller_line or "[END]" in caller_line:
             break
     ok, why = check(sc, rec, seeded)
-    lang_ok = [reply_matches(t.user_lang, t.reply) for t in rec.turns]
+    # Judged against the scenario's language, not the per-turn guess, so a wrongly detected turn counts as a miss.
+    lang_ok = [reply_matches(sc["lang"], t.reply) for t in rec.turns]
     return {
         "id": sc["id"],
         "infra_error": infra,
@@ -173,6 +181,17 @@ async def run_one(sc: dict[str, Any], agent_llm: LLM, caller_llm: LLM) -> dict[s
         "models": sorted({t.model for t in rec.turns if t.model}),
         "seconds": round(time.perf_counter() - t0, 1),
         "transcript": [{"role": t["role"], "text": t["text"]} for t in transcript],
+        "tool_calls": [
+            [
+                c["tool"]
+                + "("
+                + ", ".join(f"{k}={v}" for k, v in c["args"].items())
+                + ")"
+                + ("" if c["ok"] else " -> " + str(c["result"].get("error", "")))
+                for c in t.tools
+            ]
+            for t in rec.turns
+        ],
     }
 
 

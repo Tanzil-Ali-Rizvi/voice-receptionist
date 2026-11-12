@@ -54,6 +54,18 @@ CHANGE = {
 }  # fmt: skip
 
 
+ENGLISH_WORDS = {
+    "i", "i'm", "my", "me", "the", "a", "an", "is", "are", "am", "to", "for", "can", "could", "please", "want", "need",
+    "would", "like", "what", "when", "where", "how", "do", "does", "have", "has", "with", "on", "at", "and", "it",
+    "this", "that", "you", "your", "there", "any", "of", "in", "will", "be", "book", "cancel", "move", "thanks",
+    "thank", "yes", "no", "sure", "okay", "ok", "hello", "hi",
+}  # fmt: skip
+
+
+def english_evidence(text: str) -> int:
+    return sum(1 for w in words(text) if w in ENGLISH_WORDS)
+
+
 def words(text: str) -> list[str]:
     return re.findall(r"[\wऀ-ॿ']+", (text or "").lower())
 
