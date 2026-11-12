@@ -223,6 +223,12 @@ class Desk:
             return self._err(
                 "find_slots", a, "date is outside the next 14 days", today=self.clinic.now.date().isoformat()
             )
+        if self.asked_day and day < self.asked_day:
+            return self._err(
+                "find_slots",
+                a,
+                f"the caller asked for {self.asked_day.strftime('%A %Y-%m-%d')}, not an earlier day; search that day",
+            )
         if day.weekday() not in doc.days:
             days = ", ".join(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][d] for d in doc.days)
             return self._err(

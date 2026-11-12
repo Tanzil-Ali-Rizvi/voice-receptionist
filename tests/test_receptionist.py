@@ -236,3 +236,11 @@ def test_slot_ids_are_never_spoken():
 
     s = strip_internal_ids("गुरुवार, दोपहर 2 बजे (slot_id: iyer@2026-11-12T14:00) या 2:30 बजे iyer@2026-11-12T14:30?")
     assert "iyer@" not in s and "slot_id" not in s and "2 बजे" in s
+
+
+async def test_search_cannot_drift_before_the_asked_day():
+    thu = MONDAY.replace(day=19)
+    llm = ScriptedLLM([[("find_slots", {"doctor": "iyer", "date": "2026-11-19"})], "ठीक है।"])
+    r = Receptionist(llm, Clinic(thu))
+    await r.respond("mujhe kal dentist ka appointment chahiye")
+    assert not r.desk.log[-1].ok and "Friday 2026-11-20" in r.desk.log[-1].data["error"]
