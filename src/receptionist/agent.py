@@ -103,6 +103,28 @@ How to work:
 _SLOT_ID = re.compile(r"\s*[\(\[]?\s*(?:slot[_ ]?id\s*[:=]?\s*)?`?[a-z]+@\d{4}-\d\d-\d\dT\d\d:\d\d`?\s*[\)\]]?", re.I)
 
 
+_DONE_CLAIM = re.compile(
+    r"\b(?:is|has been|have been|are|was)\s+(?:now\s+|successfully\s+|all\s+)?(?:booked|confirmed|cancell?ed|rescheduled|moved)\b"
+    r"|(?:कन्फ़र्म|कन्फर्म|बुक|रद्द|कैंसल|रीशेड्यूल)\s+(?:हो\s+(?:गई|गया|गए|चुकी|चुका)|कर\s+(?:दी|दिया|दिए))",
+    re.I,
+)
+_REF_CLAIM = re.compile(r"reference|ref\b|रेफ़रेंस|रेफरेंस|संदर्भ", re.I)
+_REAL_REF = re.compile(r"SFC-\d{4}")
+
+
+def claims_done(reply: str, known_refs: set[str] | frozenset[str] = frozenset()) -> bool:
+    """Does the reply say a change happened? Quoting a real, existing reference (for a verified caller) is fine."""
+    if _DONE_CLAIM.search(reply or ""):
+        return True
+    return bool(_REF_CLAIM.search(reply or "")) and not (set(_REAL_REF.findall(reply or "")) & set(known_refs))
+
+
+NOT_DONE = {
+    "en": "I haven't made any change yet. Shall I look for a slot for you?",
+    "hi": "अभी तक मैंने कोई बदलाव नहीं किया है। क्या मैं आपके लिए कोई स्लॉट देखूँ?",
+}
+
+
 def strip_internal_ids(reply: str) -> str:
     """Slot ids ("iyer@2026-11-12T14:00") are for tools, not for reading aloud."""
     return _SLOT_ID.sub("", reply).strip()
@@ -193,6 +215,16 @@ class Receptionist:
             p = self.desk.pending
             turn.reply = p.readback_hi if out_lang == "hi" else p.readback_en
             turn.guards.append("exact read-back")
+        # The model may say "booked" (with an invented reference) when code changed nothing. Only a commit may say so.
+        if (
+            not (committed is not None and committed.ok)
+            and not proposed
+            and not any(r.ok and r.name == "find_my_appointments" for r in new_logs)  # describing a real booking
+            and claims_done(turn.reply, {b["ref"] for b in self.clinic.bookings(include_seeded=True)})
+        ):
+            p = self.desk.pending
+            turn.reply = (p.readback_hi if out_lang == "hi" else p.readback_en) if p else NOT_DONE[out_lang]
+            turn.guards.append("blocked false success claim")
         if committed is not None and committed.ok:
             ref = committed.data.get("booking_ref", "")
             if ref and ref not in turn.reply:

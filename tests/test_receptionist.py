@@ -244,3 +244,35 @@ async def test_search_cannot_drift_before_the_asked_day():
     r = Receptionist(llm, Clinic(thu))
     await r.respond("mujhe kal dentist ka appointment chahiye")
     assert not r.desk.log[-1].ok and "Friday 2026-11-20" in r.desk.log[-1].data["error"]
+
+
+def test_danda_does_not_hide_a_yes():
+    from receptionist.lang import confirmation
+
+    assert confirmation("हाँ।") == "yes" and confirmation("जी हां।") == "yes" and confirmation("नहीं।") == "no"
+
+
+async def test_invented_confirmation_is_replaced_with_the_read_back():
+    clinic = Clinic(MONDAY)
+    slot = first_free(clinic, "iyer", "2026-11-17")
+    llm = ScriptedLLM([
+        [("propose_booking", {"slot_id": slot, "patient_name": "Suresh Yadav", "phone": "9810098100"})],
+        "ठीक है।",
+        "आपकी अपॉइंटमेंट कन्फ़र्म हो गई है। रेफ़रेंस नंबर APPT2026-11-17-001।",
+    ])  # fmt: skip
+    r = Receptionist(llm, clinic)
+    await r.respond("सुरेश यादव, 9810098100, डेंटिस्ट")
+    t = await r.respond("एक मिनट, सोच रहा हूँ")  # neither yes nor no: nothing may be committed
+    assert "blocked false success claim" in t.guards and "APPT" not in t.reply
+    assert r.desk.pending is not None and t.reply == r.desk.pending.readback_hi
+
+
+def test_success_claims_are_recognised():
+    from receptionist.agent import claims_done
+
+    assert claims_done("Your appointment has been booked. Reference APPT-1.")
+    assert claims_done("आपकी अपॉइंटमेंट बुक हो गई है।")
+    assert not claims_done("Shall I confirm?") and not claims_done("क्या मैं बुक कर दूँ?")
+    assert not claims_done("You can cancel free of charge up to 2 hours before.")
+    assert not claims_done("Your booking reference is SFC-8166.", {"SFC-8166"})
+    assert claims_done("Your booking reference is SFC-0001.", {"SFC-8166"})

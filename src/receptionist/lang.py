@@ -67,7 +67,8 @@ def english_evidence(text: str) -> int:
 
 
 def words(text: str) -> list[str]:
-    return re.findall(r"[\wऀ-ॿ']+", (text or "").lower())
+    # Devanagari letters and vowel signs, but not the danda (।, ॥), which ends a Hindi sentence like a full stop.
+    return re.findall(r"[\w\u0900-\u0963\u0966-\u097f']+", (text or "").lower())
 
 
 def detect(text: str) -> Lang:
