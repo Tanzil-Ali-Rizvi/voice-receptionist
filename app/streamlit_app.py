@@ -25,7 +25,7 @@ def _code_stamp() -> str:
 # Streamlit only reloads modules inside the app's own folder. After a deploy, drop the old copies of the
 # receptionist package so this rerun imports the new code (otherwise it stays in memory until a reboot).
 CODE_STAMP = _code_stamp()
-if getattr(sys.modules.get("receptionist"), "CODE_STAMP", CODE_STAMP) != CODE_STAMP:
+if getattr(sys.modules.get("receptionist"), "CODE_STAMP", None) != CODE_STAMP:
     for name in [m for m in sys.modules if m == "receptionist" or m.startswith("receptionist.")]:
         del sys.modules[name]
 import receptionist  # noqa: E402
