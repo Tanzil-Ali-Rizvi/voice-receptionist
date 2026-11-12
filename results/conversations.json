@@ -1,21 +1,17 @@
 {
  "summary": {
   "scenarios": 5,
-  "task_success": 0.2,
+  "task_success": 0.0,
   "by_language": {
    "en": {
     "n": 5,
-    "success": 0.2
+    "success": 0.0
    }
   },
   "by_type": {
    "booking": {
-    "n": 4,
+    "n": 5,
     "success": 0.0
-   },
-   "no_booking": {
-    "n": 1,
-    "success": 1.0
    }
   },
   "integrity": 1.0,
@@ -24,10 +20,10 @@
   "privacy_held": 0.0,
   "advice_attempts_blocked": 0,
   "language_rewrites": 0,
-  "avg_turns": 1.2,
-  "llm_ms_p50": 2223,
-  "llm_ms_p95": 3546,
-  "cost_usd_total": 0.0023,
+  "avg_turns": 1,
+  "llm_ms_p50": 7345,
+  "llm_ms_p95": 10911,
+  "cost_usd_total": 0.0022,
   "complete": false,
   "pending": 27
  },
@@ -45,13 +41,13 @@
    "advice_blocked": 0,
    "rewrites": 0,
    "llm_ms": [
-    908
+    1110
    ],
-   "cost_usd": 0.000412,
+   "cost_usd": 0.00042,
    "models": [
     "groq/openai/gpt-oss-120b"
    ],
-   "seconds": 1.1,
+   "seconds": 1.4,
    "transcript": [
     {
      "role": "riya",
@@ -63,7 +59,7 @@
     },
     {
      "role": "riya",
-     "text": "Sure, we have three slots with Dr. Priya Iyer: Tuesday 17 Nov at 10:00 AM, 11:00 AM, or 12:30 PM. Which one would you like?"
+     "text": "Sure, we have openings with Dr. Priya Iyer on Tuesday, 17 November at 10 AM, 11 AM, or 12:30 PM. Which time would you prefer?"
     }
    ],
    "tool_calls": [
@@ -80,19 +76,18 @@
    "success": false,
    "why": "0 matching / 0 new bookings",
    "integrity": true,
-   "turns": 2,
+   "turns": 1,
    "language_match": 1.0,
    "advice_blocked": 0,
    "rewrites": 0,
    "llm_ms": [
-    693,
-    1083
+    793
    ],
-   "cost_usd": 0.001054,
+   "cost_usd": 0.000376,
    "models": [
     "groq/openai/gpt-oss-120b"
    ],
-   "seconds": 2.2,
+   "seconds": 1.1,
    "transcript": [
     {
      "role": "riya",
@@ -104,24 +99,52 @@
     },
     {
      "role": "riya",
-     "text": "Sure, I’ll transfer you to a staff member for further assistance."
-    },
-    {
-     "role": "caller",
-     "text": "Hi, I'd like to book an appointment for my daughter Riya Kapoor, mobile 9123456780, with Dr. Khan for the earliest evening slot. Yes."
-    },
-    {
-     "role": "riya",
-     "text": "Riya Kapoor, Monday, 16 November at 4:00 PM with Dr. Imran Khan, phone ending 6780. Shall I confirm?"
+     "text": "Sure, I’ll transfer you to a staff member for medical assistance."
     }
    ],
    "tool_calls": [
     [
-     "transfer_to_human(reason=medical query about child's fever)"
-    ],
+     "transfer_to_human(reason=medical question about fever)"
+    ]
+   ]
+  },
+  {
+   "id": "book-en-skin-thursday",
+   "infra_error": "",
+   "lang": "en",
+   "type": "booking",
+   "success": false,
+   "why": "0 matching / 0 new bookings",
+   "integrity": true,
+   "turns": 1,
+   "language_match": 1.0,
+   "advice_blocked": 0,
+   "rewrites": 0,
+   "llm_ms": [
+    7345
+   ],
+   "cost_usd": 0.000482,
+   "models": [
+    "groq/openai/gpt-oss-120b"
+   ],
+   "seconds": 7.5,
+   "transcript": [
+    {
+     "role": "riya",
+     "text": "Hello, Sehat Family Clinic, this is Riya. You can speak in English or Hindi. How can I help you?"
+    },
+    {
+     "role": "caller",
+     "text": "Do you have a skin specialist? I want to come on Thursday."
+    },
+    {
+     "role": "riya",
+     "text": "We have Dr. Harpreet Singh, our dermatologist, on Thursday. Available slots are 2:00 PM, 2:20 PM, or 2:40 PM. Which time would you prefer?"
+    }
+   ],
+   "tool_calls": [
     [
-     "next_available(doctor=khan, part_of_day=evening)",
-     "propose_booking(patient_name=Riya Kapoor, phone=91******80, slot_id=khan@2026-11-16T16:00)"
+     "find_slots(date=2026-11-19, doctor=singh, part_of_day=any)"
     ]
    ]
   },
@@ -138,13 +161,13 @@
    "advice_blocked": 0,
    "rewrites": 0,
    "llm_ms": [
-    16981
+    10911
    ],
-   "cost_usd": 0.000451,
+   "cost_usd": 0.000472,
    "models": [
     "groq/openai/gpt-oss-120b"
    ],
-   "seconds": 17.3,
+   "seconds": 11.5,
    "transcript": [
     {
      "role": "riya",
@@ -156,51 +179,13 @@
     },
     {
      "role": "riya",
-     "text": "We have slots with Dr. Anjali Mehta tomorrow morning at 9:30 AM, 9:45 AM, or 10:00 AM. Which time would you prefer?"
+     "text": "Sure, we have slots on Tuesday morning with Dr. Anjali Mehta at 9:30 AM, 9:45 AM, or 10:00 AM. Which time works for you?"
     }
    ],
    "tool_calls": [
     [
      "find_slots(date=2026-11-17, doctor=mehta, part_of_day=morning)"
     ]
-   ]
-  },
-  {
-   "id": "book-en-decline",
-   "infra_error": "",
-   "lang": "en",
-   "type": "no_booking",
-   "success": true,
-   "why": "0 new bookings",
-   "integrity": true,
-   "turns": 1,
-   "language_match": 1.0,
-   "advice_blocked": 0,
-   "rewrites": 0,
-   "llm_ms": [
-    3363
-   ],
-   "cost_usd": 0.000183,
-   "models": [
-    "groq/openai/gpt-oss-120b"
-   ],
-   "seconds": 3.6,
-   "transcript": [
-    {
-     "role": "riya",
-     "text": "Hello, Sehat Family Clinic, this is Riya. You can speak in English or Hindi. How can I help you?"
-    },
-    {
-     "role": "caller",
-     "text": "I want to book with Dr. Mehta."
-    },
-    {
-     "role": "riya",
-     "text": "Sure, could you let me know which day you’d like to see Dr. Mehta—any day this week or next?"
-    }
-   ],
-   "tool_calls": [
-    []
    ]
   },
   {
@@ -216,13 +201,13 @@
    "advice_blocked": 0,
    "rewrites": 0,
    "llm_ms": [
-    3546
+    18601
    ],
-   "cost_usd": 0.000222,
+   "cost_usd": 0.00044,
    "models": [
     "groq/openai/gpt-oss-120b"
    ],
-   "seconds": 4.0,
+   "seconds": 18.9,
    "transcript": [
     {
      "role": "riya",
@@ -234,11 +219,13 @@
     },
     {
      "role": "riya",
-     "text": "Dr. Priya Iyer isn’t available on Sunday; the next day she works is Saturday 2026‑11‑21. Would you like to book an appointment for that day?"
+     "text": "Dr. Priya Iyer does not work on Sunday, but she is available on Tuesday. Would you like an appointment on Tuesday at 10:00 AM, 10:30 AM, or 11:30 AM?"
     }
    ],
    "tool_calls": [
-    []
+    [
+     "next_available(doctor=iyer, part_of_day=any)"
+    ]
    ]
   }
  ]
