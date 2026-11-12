@@ -50,7 +50,7 @@ TOOLS: list[dict[str, Any]] = [
         "type": "function",
         "function": {
             "name": "next_available",
-            "description": "Earliest free slots in the next 14 days.",
+            "description": "Earliest free slots in the next 14 days, starting from the day the caller asked for.",
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -164,6 +164,7 @@ class Desk:
     verified_phone: str | None = None  # set after a successful find_my_appointments
     handoff: str | None = None
     lang: str = "en"  # the reply language; tool results describe slots only in it, to keep prompts small
+    asked_day: date | None = None  # the day the caller named this turn ("kal"), resolved in code
     log: list[ToolResult] = field(default_factory=list)
 
     # ------------------------------------------------------------ helpers
@@ -182,6 +183,16 @@ class Desk:
 
     def _slots(self, doc: Doctor, starts: list[datetime]) -> list[dict[str, str]]:
         return [{"slot_id": slot_id(doc.id, s), "when": describe_slot(doc, s, self.lang)} for s in starts]
+
+    def _working_days_from(self, doc: Doctor, day: date, n: int = 2) -> list[str]:
+        out, k = [], 0
+        last = (self.clinic.now + timedelta(days=14)).date()
+        while len(out) < n and day + timedelta(days=k) <= last:
+            d = day + timedelta(days=k)
+            if d.weekday() in doc.days:
+                out.append(d.strftime("%A %Y-%m-%d"))
+            k += 1
+        return out
 
     def _rb(self) -> str:
         assert self.pending is not None
@@ -214,7 +225,14 @@ class Desk:
             )
         if day.weekday() not in doc.days:
             days = ", ".join(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][d] for d in doc.days)
-            return self._err("find_slots", a, f"{doc.name} does not see patients on that day", works_on=days)
+            return self._err(
+                "find_slots",
+                a,
+                f"{doc.name} does not see patients on {day.strftime('%A')}s. Tell the caller this plainly, "
+                "then offer the nearest day.",
+                works_on=days,
+                nearest_days=self._working_days_from(doc, day),
+            )
         free = self.clinic.free_slots(doc, day, a.get("part_of_day") or "any")
         return ToolResult(
             "find_slots",
@@ -227,13 +245,22 @@ class Desk:
         doc = self._doctor(a.get("doctor", ""))
         if doc is None:
             return self._err("next_available", a, "unknown doctor or specialty", doctors=self.doctor_list())
+        today = self.clinic.now.date()
+        start = self.asked_day if self.asked_day and self.asked_day >= today else today
         found: list[datetime] = []
         for k in range(15):
-            day = (self.clinic.now + timedelta(days=k)).date()
+            day = start + timedelta(days=k)
+            if day > today + timedelta(days=14):
+                break
             found += self.clinic.free_slots(doc, day, a.get("part_of_day") or "any")
             if len(found) >= 3:
                 break
-        return ToolResult("next_available", a, True, {"doctor": doc.name, "slots": self._slots(doc, found[:3])})
+        data: dict[str, Any] = {"doctor": doc.name, "slots": self._slots(doc, found[:3])}
+        if self.asked_day and found and found[0].date() != self.asked_day:
+            why = "does not work" if self.asked_day.weekday() not in doc.days else "is fully booked"
+            data["note"] = (f"The caller asked for {self.asked_day.strftime('%A %Y-%m-%d')}; {doc.name} {why} that "
+                            "day. Say so plainly before offering these.")  # fmt: skip
+        return ToolResult("next_available", a, True, data)
 
     def t_propose_booking(self, a: dict) -> ToolResult:
         parsed = parse_slot_id(a.get("slot_id", ""))

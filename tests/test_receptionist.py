@@ -216,3 +216,23 @@ async def test_date_note_reaches_the_model():
     llm = ScriptedLLM(["ठीक है।"])
     await Receptionist(llm, Clinic(MONDAY)).respond("kal dentist milega?")
     assert "kal' = tomorrow = Tuesday 2026-11-17" in llm.seen[0][0]["content"]
+
+
+async def test_day_the_doctor_does_not_work_is_said_plainly():
+    # Thursday 12 Nov: "kal" is Friday, and the dentist works Tue/Thu/Sat.
+    thu = MONDAY.replace(day=19)
+    llm = ScriptedLLM([[("next_available", {"doctor": "dentist"})], "ठीक है।"])
+    r = Receptionist(llm, Clinic(thu))
+    await r.respond("mujhe kal dentist ka appointment chahiye")
+    res = r.desk.log[-1]
+    assert res.data["slots"] and all("2026-11-20" not in s["slot_id"] for s in res.data["slots"])
+    assert res.data["slots"][0]["slot_id"].startswith("iyer@2026-11-21") and "does not work" in res.data["note"]
+    bad = r.desk.run("find_slots", {"doctor": "iyer", "date": "2026-11-20"})
+    assert not bad.ok and bad.data["nearest_days"][0] == "Saturday 2026-11-21"
+
+
+def test_slot_ids_are_never_spoken():
+    from receptionist.agent import strip_internal_ids
+
+    s = strip_internal_ids("गुरुवार, दोपहर 2 बजे (slot_id: iyer@2026-11-12T14:00) या 2:30 बजे iyer@2026-11-12T14:30?")
+    assert "iyer@" not in s and "slot_id" not in s and "2 बजे" in s
