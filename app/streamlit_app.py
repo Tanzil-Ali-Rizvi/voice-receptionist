@@ -13,7 +13,24 @@ from pathlib import Path
 
 import streamlit as st
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+SRC = Path(__file__).resolve().parents[1] / "src"
+sys.path.insert(0, str(SRC))
+
+
+def _code_stamp() -> str:
+    files = sorted((SRC / "receptionist").glob("*.py"))
+    return hashlib.sha1(b"".join(f.read_bytes() for f in files)).hexdigest()[:12]
+
+
+# Streamlit only reloads modules inside the app's own folder. After a deploy, drop the old copies of the
+# receptionist package so this rerun imports the new code (otherwise it stays in memory until a reboot).
+CODE_STAMP = _code_stamp()
+if getattr(sys.modules.get("receptionist"), "CODE_STAMP", CODE_STAMP) != CODE_STAMP:
+    for name in [m for m in sys.modules if m == "receptionist" or m.startswith("receptionist.")]:
+        del sys.modules[name]
+import receptionist  # noqa: E402
+
+receptionist.CODE_STAMP = CODE_STAMP  # type: ignore[attr-defined]
 
 from receptionist.agent import GREETING, Receptionist  # noqa: E402
 from receptionist.clinic import DOCTOR_BY_ID, DOCTORS, Clinic, describe_slot, mask_phone  # noqa: E402
@@ -45,18 +62,19 @@ def run(coro):
 
 
 @st.cache_resource
-def shared_llm():
+def shared_llm(code: str):
     return from_env()
 
 
 def new_call() -> None:
-    st.session_state.rec = Receptionist(shared_llm(), Clinic())
+    st.session_state.rec = Receptionist(shared_llm(CODE_STAMP), Clinic())
+    st.session_state.code = CODE_STAMP
     st.session_state.chat = [{"role": "riya", "text": GREETING["en"], "lang": "en", "audio": None, "meta": ""}]
     st.session_state.last_audio = None
     st.session_state.timing = {}
 
 
-if "rec" not in st.session_state:
+if "rec" not in st.session_state or st.session_state.get("code") != CODE_STAMP:
     new_call()
 rec: Receptionist = st.session_state.rec
 
