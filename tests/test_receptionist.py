@@ -300,3 +300,26 @@ def test_part_of_day_falls_back_to_that_days_times():
     desk = Desk(Clinic(MONDAY))
     res = desk.run("find_slots", {"doctor": "khan", "date": "2026-11-18", "part_of_day": "afternoon"})
     assert res.ok and res.data["slots"] and "nothing in the afternoon" in res.data["note"]
+
+
+@pytest.mark.parametrize(
+    "a,b,same",
+    [
+        ("Sunita Verma", "सुनिता वर्मा", True), ("Rahul Sharma", "राहुल शर्मा", True), ("Anaya Singh", "अनाया सिंह", True),
+        ("Imran Qureshi", "इमरान क़ुरैशी", True), ("Rahul Sharma", "Rohit Sharma", False), ("Neha Arora", "Anaya Arora", False),
+        ("Sunita", "Suman", False),
+    ],
+)  # fmt: skip
+def test_names_match_across_scripts(a, b, same):
+    from receptionist.names import same_name
+
+    assert same_name(a, b) is same
+
+
+def test_hindi_caller_finds_her_english_booking():
+    from receptionist.tools import Desk
+
+    desk = Desk(Clinic(MONDAY))
+    res = desk.run("find_my_appointments", {"patient_name": "सुनिता वर्मा", "phone": "9876543210"})
+    assert res.ok and len(res.data["appointments"]) == 1
+    assert not desk.run("find_my_appointments", {"patient_name": "Suman", "phone": "9876543210"}).data["appointments"]

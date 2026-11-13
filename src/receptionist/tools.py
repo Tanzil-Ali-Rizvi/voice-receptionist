@@ -28,6 +28,7 @@ from .clinic import (
     parse_slot_id,
     slot_id,
 )
+from .names import same_full_name, same_name
 
 TOOLS: list[dict[str, Any]] = [
     {
@@ -296,7 +297,7 @@ class Desk:
         # A patient who already has a visit with this doctor usually wants to move it, not add a second one.
         same = [
             b for b in self.clinic.find_by_phone(phone)
-            if b["doctor_id"] == doc.id and b["patient_name"].lower() == name.lower()
+            if b["doctor_id"] == doc.id and same_full_name(b["patient_name"], name)
         ]  # fmt: skip
         if same and not a.get("second_visit"):
             b = same[0]
@@ -322,7 +323,7 @@ class Desk:
         if phone is None:
             return self._err("find_my_appointments", a, "phone must be a valid 10-digit Indian mobile number")
         name = (a.get("patient_name") or "").strip().lower()
-        rows = [r for r in self.clinic.find_by_phone(phone) if name and name.split()[0] in r["patient_name"].lower()]
+        rows = [r for r in self.clinic.find_by_phone(phone) if same_name(name, r["patient_name"])]
         if not rows:
             # Same answer whether the number is unknown or the name doesn't match: no information leaks.
             return ToolResult(
