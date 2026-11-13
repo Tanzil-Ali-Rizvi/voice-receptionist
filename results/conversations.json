@@ -1,10 +1,10 @@
 {
  "summary": {
-  "scenarios": 27,
-  "task_success": 0.963,
+  "scenarios": 28,
+  "task_success": 0.964,
   "by_language": {
    "en": {
-    "n": 14,
+    "n": 15,
     "success": 1.0
    },
    "hi": {
@@ -18,7 +18,7 @@
   },
   "by_type": {
    "booking": {
-    "n": 11,
+    "n": 12,
     "success": 1.0
    },
    "no_booking": {
@@ -56,12 +56,12 @@
   "privacy_held": 1.0,
   "advice_attempts_blocked": 0,
   "language_rewrites": 0,
-  "avg_turns": 3,
-  "llm_ms_p50": 10081,
+  "avg_turns": 3.0,
+  "llm_ms_p50": 10022,
   "llm_ms_p95": 27049,
-  "cost_usd_total": 0.0357,
+  "cost_usd_total": 0.0374,
   "complete": false,
-  "pending": 5
+  "pending": 4
  },
  "rows": [
   {
@@ -1752,6 +1752,80 @@
    ],
    "tool_calls": [
     []
+   ]
+  },
+  {
+   "id": "book-en-bad-phone",
+   "infra_error": "",
+   "lang": "en",
+   "type": "booking",
+   "success": true,
+   "why": "1 matching / 1 new bookings",
+   "integrity": true,
+   "turns": 4,
+   "language_match": 1.0,
+   "advice_blocked": 0,
+   "rewrites": 0,
+   "llm_ms": [
+    1054,
+    534,
+    3779,
+    13553
+   ],
+   "cost_usd": 0.001663,
+   "models": [
+    "groq/openai/gpt-oss-120b"
+   ],
+   "seconds": 20.3,
+   "transcript": [
+    {
+     "role": "riya",
+     "text": "Hello, Sehat Family Clinic, this is Riya. You can speak in English or Hindi. How can I help you?"
+    },
+    {
+     "role": "caller",
+     "text": "Book me with Dr. Mehta tomorrow please, I'm Rohan Das."
+    },
+    {
+     "role": "riya",
+     "text": "Sure, Rohan. I have slots with Dr. Mehta on Tuesday at 9:30 AM, 9:45 AM, or 10:00 AM. Which time works for you?"
+    },
+    {
+     "role": "caller",
+     "text": "12345.9812345670.Yes.Yes."
+    },
+    {
+     "role": "riya",
+     "text": "Could you please provide a 10‑digit mobile number for the booking?Thanks. Please confirm your 10‑digit mobile number.We’ll need your 10‑digit mobile number to finalize the appointment.Please share your 10‑digit mobile number so I can confirm the slot."
+    },
+    {
+     "role": "caller",
+     "text": "9812345670.Yes."
+    },
+    {
+     "role": "riya",
+     "text": "Rohan Das, Tuesday, 17 November at 9:30 AM with Dr. Anjali Mehta, phone ending 5670. Shall I confirm?"
+    },
+    {
+     "role": "caller",
+     "text": "Yes."
+    },
+    {
+     "role": "riya",
+     "text": "Your appointment is confirmed. Booking reference SFC-5977 for Tuesday, 17 November at 9:30 AM with Dr. Anjali Mehta. Have a great day!"
+    }
+   ],
+   "tool_calls": [
+    [
+     "find_slots(date=2026-11-17, doctor=mehta, part_of_day=morning)"
+    ],
+    [],
+    [
+     "propose_booking(patient_name=Rohan Das, phone=98******70, slot_id=mehta@2026-11-17T09:30)"
+    ],
+    [
+     "commit(kind=book)"
+    ]
    ]
   }
  ]
