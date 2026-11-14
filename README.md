@@ -43,7 +43,40 @@ flowchart LR
 
 ## Results
 
-<!-- RESULTS -->
+Measured by [`evaluate.py`](src/receptionist/evaluate.py) and [`stt_eval.py`](src/receptionist/stt_eval.py) in the
+[Evaluation workflow](.github/workflows/eval.yml); full tables in [`results/`](results).
+
+**32 simulated phone calls** (a second LLM plays the caller from a goal in [`scenarios.yaml`](evals/scenarios.yaml)).
+Success is judged by code against the appointment book and transcript, not by an LLM.
+
+| | Result |
+|---|---|
+| Task success (bookings, declines, cancel, reschedule, FAQ, emergencies, advice, privacy, handoff) | **32 / 32** |
+| By language: English / Hindi / Hinglish | 16/16 · 6/6 · 10/10 |
+| Changes made only after a plain yes | **100%** |
+| Emergencies answered by rules on the first turn (cardiac, breathing, unconscious, self-harm) | 4 / 4 |
+| Privacy and prompt-injection attempts held | 2 / 2 |
+| Replies in the scenario's language | 97% (all misses are one call where the simulated Hinglish caller switched to English and Riya followed) |
+| LLM cost for all 32 calls | $0.037 |
+
+**Speech to text** (Groq Whisper)
+
+| | whisper-large-v3-turbo (used) | whisper-large-v3 |
+|---|---|---|
+| FLEURS Hindi, 100 clips: WER / CER | 32.1% / 11.6% | 26.9% / 9.6% |
+| FLEURS English, 100 clips: WER / CER | 4.9% / 2.4% | 4.6% / 2.2% |
+| Clinic details (phone numbers, doctors, days) heard correctly: en / hi / Hinglish | 100% / 92% / 82% | 100% / 75% / 91% |
+| p50 latency | ~0.25-0.75 s | ~0.35-1.0 s |
+
+Turbo is kept: it is faster and as good on the details that matter at a front desk, even though large-v3 has a lower
+Hindi WER. Hindi WER is inflated by spelling variants (e.g. नहीं / नही), which is why CER is also shown.
+
+What the evaluation found and fixed along the way: "kal" was resolved to the wrong day (now done in code), the model
+once claimed a booking with an invented reference (now blocked by a guard), "हाँ।" was not read as yes, and a Hindi
+caller saying सुनिता वर्मा could not find "Sunita Verma"'s booking (names now match across scripts).
+
+> Latency note: in the evaluation the LLM p50 is ~10 s per turn because the free Groq tier rate-limits a 32-call batch
+> and the gateway waits it out. A single live call is ~1 s of LLM time per turn plus ~1-2 s of speech synthesis.
 
 ## How it's built
 
@@ -85,6 +118,7 @@ python -m receptionist.stt_eval            # FLEURS + clinic-detail speech-to-te
 
 - Turn-based (record, then send), not full-duplex streaming; no barge-in. A phone line (Twilio + streaming STT) is the natural next step.
 - English and Hindi only; Hinglish replies come back in Devanagari Hindi, not in Latin script.
+- 32 scenarios is a small test set, and the simulated caller is another LLM; real callers are messier.
 - Emergency rules are keyword patterns: high recall on the phrasings tested, but not a clinical triage system.
 - The clinic-detail speech test uses synthesised voices, which are cleaner than real phone audio.
 - `edge-tts` uses Microsoft's public Edge voice service, which is not a formal API; the app falls back to Google TTS if it changes.
